@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>English Speaking Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .card {
+            background: rgba(0,0,0,0.25);
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            margin: auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            margin-bottom: 10px;
+        }
+
+        #sentence {
+            font-size: 22px;
+            margin: 20px 0;
+            min-height: 40px;
+        }
+
+        button {
+            padding: 12px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 25px;
+            margin: 10px;
+            cursor: pointer;
+        }
+
+        .start {
+            background: #00e676;
+            color: black;
+        }
+
+        .stop {
+            background: #ff5252;
+            color: white;
+        }
+
+        #status {
+            margin-top: 15px;
+            font-size: 16px;
+        }
+
+        #final {
+            font-size: 26px;
+            display: none;
+            animation: pop 1s ease-in-out;
+        }
+
+        @keyframes pop {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h1>🎤 English Speaking Test</h1>
+    <p id="sentence"></p>
+
+    <button class="start" onclick="startRecording()">Start Recording</button>
+    <button class="stop" onclick="stopRecording()">Stop Recording</button>
+
+    <p id="status"></p>
+    <div id="final">🎉 Congratulations!<br>You passed 12/14 and your English is very good! 🌟</div>
+</div>
+
+<script>
+    const tasks = [
+        "Hello how are you?",
+        "What are you doing?",
+    "Despite the unexpected weather conditions, the event continued as planned.",
+    "Effective communication requires not only speaking clearly but also listening carefully.",
+    "She quickly realized that solving the problem would require patience and persistence.",
+    "Technological advancements have significantly changed the way people interact globally.",
+    "Although he was exhausted, he managed to complete the task with remarkable accuracy.",
+    "Learning a new language becomes easier when you practice consistently every day.",
+    "The decision was made after considering multiple perspectives and possible outcomes.",
+    "Confidence grows when challenges are faced with determination rather than fear.",
+    "Success often depends on the ability to adapt to rapidly changing situations.",
+    "I love you.",
+"I hate you.",
+"Do you know about Elbert?"
+];
+
+    let currentTask = 0;
+    let mediaRecorder;
+    let audioChunks = [];
+
+    document.getElementById("sentence").innerText = tasks[currentTask];
+
+    async function startRecording() {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
+        audioChunks = [];
+
+        mediaRecorder.start();
+        document.getElementById("status").innerText = "Recording...";
+
+        mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+    }
+
+    function stopRecording() {
+        mediaRecorder.stop();
+        document.getElementById("status").innerText = "Uploading...";
+
+        mediaRecorder.onstop = async () => {
+            const blob = new Blob(audioChunks, { type: "audio/webm" });
+            const formData = new FormData();
+            formData.append("audio", blob);
+            formData.append("task", currentTask + 1);
+
+            await fetch("/upload", {
+                method: "POST",
+                body: formData
+            });
+
+            currentTask++;
+
+            if (currentTask < tasks.length) {
+                document.getElementById("sentence").innerText = tasks[currentTask];
+                document.getElementById("status").innerText = "Good! Next sentence 👇";
+            } else {
+                document.getElementById("sentence").style.display = "none";
+                document.getElementById("status").style.display = "none";
+                document.getElementById("final").style.display = "block";
+            }
+        };
+    }
+</script>
+
+</body>
+</html>
