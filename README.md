@@ -74,10 +74,15 @@ JavaScript
 ## 📂 Project Structure
 
 Voice-Recorder/
+
 │── index.html
+
 │── style.css
+
 │── script.js
+
 │── assets/
+
 └── README.md
 
 
