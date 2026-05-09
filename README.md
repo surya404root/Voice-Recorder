@@ -31,7 +31,7 @@ A simple and lightweight Voice Recorder project that allows users to record, pla
 ```
 git clone https://github.com/surya404root/Voice-Recorder.git
 ```
-###Open Project
+### Open Project
 ```
 cd Voice-Recorder
 ```
